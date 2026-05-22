@@ -1,0 +1,11 @@
+node_modules
+.env
+.wwebjs_auth
+.wwebjs_cache
+session
+.git
+.gitignore
+PLAN.md
+GEMINI.md
+SETUP.md
+*.md
