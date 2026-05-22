@@ -31,9 +31,7 @@ const client = new Client({
 });
 
 const BOT_NAME = process.env.BOT_NAME || 'Bot';
-const WHITELISTED_GROUPS = process.env.WHITELISTED_GROUPS 
-    ? process.env.WHITELISTED_GROUPS.split(',').map(g => g.trim()).filter(Boolean) 
-    : [];
+
 
 // Track recent outgoing responses to prevent the bot from responding to its own messages
 const recentResponses = new Set();
@@ -73,10 +71,7 @@ client.on('message_create', async (msg) => {
         console.log(`[GROUP] "${chat.name}" → ID: ${chat.id._serialized}`);
     }
 
-    // 2. Group Whitelist Check
-    if (isGroup && WHITELISTED_GROUPS.length > 0 && !WHITELISTED_GROUPS.includes(chat.id._serialized)) {
-        return;
-    }
+
 
     // 3. Mention/Trigger Detection
     // Check if the bot is mentioned or its name is used
