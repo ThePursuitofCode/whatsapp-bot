@@ -60,23 +60,11 @@ client.on('message_create', async (msg) => {
     const chat = await msg.getChat();
     const isGroup = chat.isGroup;
     
-    // Allow own messages in:
-    // 1. Group chats (if the bot name is mentioned)
-    // 2. The "Message Yourself" 1-on-1 chat
+    // Allow own messages ONLY if the bot's name is explicitly used.
     // We ignore all other outgoing messages to prevent looping/spam.
     if (msg.fromMe) {
         const containsBotName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
-        
-        // Helper to strip device ID (e.g., "123:4@lid" -> "123@lid")
-        const cleanId = (id) => id ? id.replace(/:[0-9]+/, '') : '';
-        
-        const isMessageYourselfChat = !isGroup && (
-            cleanId(msg.to) === cleanId(msg.from) || 
-            cleanId(msg.to) === cleanId(msg.author) ||
-            chat.id._serialized === client.info.wid._serialized
-        );
-        
-        if (!(isGroup && containsBotName) && !isMessageYourselfChat) {
+        if (!containsBotName) {
             return;
         }
     }
@@ -95,7 +83,7 @@ client.on('message_create', async (msg) => {
     const isMentioned = mentions.some(m => m.id._serialized === client.info.wid._serialized);
     const containsName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
 
-    if (isMentioned || (isGroup && containsName) || (!isGroup)) {
+    if (isMentioned || containsName) {
         // 4. Anti-Abuse: Rate Limiting
         const senderId = msg.author || msg.from;
         if (isRateLimited(senderId)) {
