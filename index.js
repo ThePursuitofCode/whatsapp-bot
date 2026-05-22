@@ -55,19 +55,12 @@ client.on('message_create', async (msg) => {
     // 1. Basic Filters
     if (msg.type !== 'chat') return; // Only respond to text messages
     
-    console.log(`[DEBUG] Message received. body: "${msg.body}", fromMe: ${msg.fromMe}, from: ${msg.from}, to: ${msg.to}, author: ${msg.author}`);
+    console.log(`[DEBUG] Message received. body: "${msg.body}", expectedName: "${BOT_NAME}", fromMe: ${msg.fromMe}, from: ${msg.from}, to: ${msg.to}, author: ${msg.author}`);
     
     const chat = await msg.getChat();
     const isGroup = chat.isGroup;
     
-    // Allow own messages ONLY if the bot's name is explicitly used.
-    // We ignore all other outgoing messages to prevent looping/spam.
-    if (msg.fromMe) {
-        const containsBotName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
-        if (!containsBotName) {
-            return;
-        }
-    }
+
     
     // Log group info so you can find group IDs for whitelisting
     if (isGroup) {
