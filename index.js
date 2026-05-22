@@ -68,7 +68,7 @@ client.on('message_create', async (msg) => {
         const containsBotName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
         
         // Helper to strip device ID (e.g., "123:4@lid" -> "123@lid")
-        const cleanId = (id) => id ? id.split(':')[0] + (id.includes('@') ? id.substring(id.indexOf('@')) : '') : '';
+        const cleanId = (id) => id ? id.replace(/:[0-9]+/, '') : '';
         
         const isMessageYourselfChat = !isGroup && (
             cleanId(msg.to) === cleanId(msg.from) || 
