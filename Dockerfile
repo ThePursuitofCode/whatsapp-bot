@@ -65,9 +65,12 @@ COPY . .
 # Create session directory for WhatsApp auth persistence
 RUN mkdir -p /app/session
 
+# Make startup script executable
+RUN chmod +x /app/start.sh
+
 # Run as non-root user for security (Chromium --no-sandbox still required)
 RUN groupadd -r botuser && useradd -r -g botuser -d /app botuser \
     && chown -R botuser:botuser /app
 USER botuser
 
-CMD ["node", "index.js"]
+CMD ["./start.sh"]
