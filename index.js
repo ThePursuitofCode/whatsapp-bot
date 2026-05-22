@@ -55,6 +55,8 @@ client.on('message_create', async (msg) => {
     // 1. Basic Filters
     if (msg.type !== 'chat') return; // Only respond to text messages
     
+    console.log(`[DEBUG] Message received. body: "${msg.body}", fromMe: ${msg.fromMe}, from: ${msg.from}, to: ${msg.to}, author: ${msg.author}`);
+    
     const chat = await msg.getChat();
     const isGroup = chat.isGroup;
     
