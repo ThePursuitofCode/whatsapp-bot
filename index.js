@@ -58,12 +58,17 @@ client.on('message_create', async (msg) => {
     const chat = await msg.getChat();
     const isGroup = chat.isGroup;
     
-    // Allow own messages ONLY if in a group and the bot name is mentioned
-    // (so you can talk to your own bot). The bot's replies won't contain 
-    // the bot name, so this won't cause loops.
+    // Allow own messages in:
+    // 1. Group chats (if the bot name is mentioned)
+    // 2. The "Message Yourself" 1-on-1 chat (where msg.to === msg.from)
+    // We ignore all other outgoing messages to prevent looping/spam.
     if (msg.fromMe) {
         const containsBotName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
-        if (!(isGroup && containsBotName)) return;
+        const isMessageYourselfChat = !isGroup && msg.to === msg.from;
+        
+        if (!(isGroup && containsBotName) && !isMessageYourselfChat) {
+            return;
+        }
     }
     
     // Log group info so you can find group IDs for whitelisting
