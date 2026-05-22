@@ -62,11 +62,11 @@ client.on('message_create', async (msg) => {
     
     // Allow own messages in:
     // 1. Group chats (if the bot name is mentioned)
-    // 2. The "Message Yourself" 1-on-1 chat (where msg.to === msg.from)
+    // 2. The "Message Yourself" 1-on-1 chat
     // We ignore all other outgoing messages to prevent looping/spam.
     if (msg.fromMe) {
         const containsBotName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
-        const isMessageYourselfChat = !isGroup && msg.to === msg.from;
+        const isMessageYourselfChat = !isGroup && (chat.id._serialized === client.info.wid._serialized);
         
         if (!(isGroup && containsBotName) && !isMessageYourselfChat) {
             return;
