@@ -31,7 +31,9 @@ const client = new Client({
 });
 
 const BOT_NAME = process.env.BOT_NAME || 'Bot';
-const WHITELISTED_GROUPS = process.env.WHITELISTED_GROUPS ? process.env.WHITELISTED_GROUPS.split(',') : [];
+const WHITELISTED_GROUPS = process.env.WHITELISTED_GROUPS 
+    ? process.env.WHITELISTED_GROUPS.split(',').map(g => g.trim()).filter(Boolean) 
+    : [];
 
 client.on('qr', (qr) => {
     console.log('Scan this QR code to log in:');
