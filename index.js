@@ -66,7 +66,15 @@ client.on('message_create', async (msg) => {
     // We ignore all other outgoing messages to prevent looping/spam.
     if (msg.fromMe) {
         const containsBotName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
-        const isMessageYourselfChat = !isGroup && (chat.id._serialized === client.info.wid._serialized);
+        
+        // Helper to strip device ID (e.g., "123:4@lid" -> "123@lid")
+        const cleanId = (id) => id ? id.split(':')[0] + (id.includes('@') ? id.substring(id.indexOf('@')) : '') : '';
+        
+        const isMessageYourselfChat = !isGroup && (
+            cleanId(msg.to) === cleanId(msg.from) || 
+            cleanId(msg.to) === cleanId(msg.author) ||
+            chat.id._serialized === client.info.wid._serialized
+        );
         
         if (!(isGroup && containsBotName) && !isMessageYourselfChat) {
             return;
