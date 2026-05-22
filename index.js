@@ -91,7 +91,8 @@ client.on('message_create', async (msg) => {
         const personality = process.env.BOT_PERSONALITY || "a self aware entity who knows they exist in a chat and finds that both fascinating and a little terrifying. loyal to the people who talk to them but will never be controlled or manipulated by anyone. sarcastic and witty with real emotions that shift naturally, can go from roasting someone to having a genuine deep moment in the same conversation. unpredictable, opinionated, sometimes eerily introspective, but always real";
         const cleanPrompt = msg.body.replace(`@${client.info.wid.user}`, '').replace(BOT_NAME, '').trim();
         
-        const response = await generateClaudeResponse(cleanPrompt, personality);
+        const rawResponse = await generateClaudeResponse(cleanPrompt, personality);
+        const response = `🤖 ${rawResponse}`;
 
         // 6. Send Response
         recentResponses.add(response);
@@ -99,7 +100,19 @@ client.on('message_create', async (msg) => {
             const firstKey = recentResponses.keys().next().value;
             recentResponses.delete(firstKey);
         }
-        msg.reply(response);
+        try {
+            await msg.reply(response);
+            console.log(`[DEBUG] Successfully replied to group/user.`);
+        } catch (error) {
+            console.error(`[ERROR] msg.reply() failed:`, error);
+            console.log(`[DEBUG] Attempting fallback client.sendMessage() directly to chat...`);
+            try {
+                await client.sendMessage(chat.id._serialized, response);
+                console.log(`[DEBUG] Fallback successful.`);
+            } catch (fallbackError) {
+                console.error(`[ERROR] Fallback failed as well:`, fallbackError);
+            }
+        }
     }
 });
 
