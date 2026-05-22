@@ -35,6 +35,9 @@ const WHITELISTED_GROUPS = process.env.WHITELISTED_GROUPS
     ? process.env.WHITELISTED_GROUPS.split(',').map(g => g.trim()).filter(Boolean) 
     : [];
 
+// Track recent outgoing responses to prevent the bot from responding to its own messages
+const recentResponses = new Set();
+
 client.on('qr', (qr) => {
     console.log('Scan this QR code to log in:');
     qrcode.generate(qr, { small: true });
@@ -44,7 +47,13 @@ client.on('ready', () => {
     console.log('WhatsApp Bot is ready!');
 });
 
-client.on('message', async (msg) => {
+client.on('message_create', async (msg) => {
+    // Ignore messages sent by the bot itself to prevent infinite loops
+    if (recentResponses.has(msg.body)) {
+        recentResponses.delete(msg.body);
+        return;
+    }
+
     // 1. Basic Filters
     if (msg.type !== 'chat') return; // Only respond to text messages
     
@@ -94,6 +103,11 @@ client.on('message', async (msg) => {
         const response = await generateClaudeResponse(cleanPrompt, personality);
 
         // 6. Send Response
+        recentResponses.add(response);
+        if (recentResponses.size > 50) {
+            const firstKey = recentResponses.keys().next().value;
+            recentResponses.delete(firstKey);
+        }
         msg.reply(response);
     }
 });
