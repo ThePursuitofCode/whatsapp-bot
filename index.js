@@ -46,11 +46,18 @@ client.on('ready', () => {
 
 client.on('message', async (msg) => {
     // 1. Basic Filters
-    if (msg.fromMe) return; // Don't respond to own messages
     if (msg.type !== 'chat') return; // Only respond to text messages
     
     const chat = await msg.getChat();
     const isGroup = chat.isGroup;
+    
+    // Allow own messages ONLY if in a group and the bot name is mentioned
+    // (so you can talk to your own bot). The bot's replies won't contain 
+    // the bot name, so this won't cause loops.
+    if (msg.fromMe) {
+        const containsBotName = msg.body.toLowerCase().includes(BOT_NAME.toLowerCase());
+        if (!(isGroup && containsBotName)) return;
+    }
     
     // Log group info so you can find group IDs for whitelisting
     if (isGroup) {
